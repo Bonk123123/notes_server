@@ -1,0 +1,9 @@
+database_config: 
+    username: "postgres"
+    host: "db" 
+    port_db: "5432"
+    dbname: "postgres"
+    sslmode: "disable"
+
+http_server:
+    port_serv: "8000"
