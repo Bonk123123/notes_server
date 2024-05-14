@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/Bonk123123/notes_server/internal/config"
 	"github.com/Bonk123123/notes_server/internal/dto"
 	"github.com/Bonk123123/notes_server/internal/models"
 	"github.com/Bonk123123/notes_server/internal/pkg"
@@ -34,8 +35,8 @@ func Auth(c *gin.Context)  {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "incorect username or password"})
 	}
 
-	access_jwt, a_err := pkg.GenerateJWT(user, pkg.ACCESS)
-	refresh_jwt, r_err := pkg.GenerateJWT(user, pkg.REFRESH)
+	access_jwt, a_err := pkg.GenerateJWT(user, config.ACCESS)
+	refresh_jwt, r_err := pkg.GenerateJWT(user, config.REFRESH)
 
 	if a_err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": a_err.Error()})
@@ -73,8 +74,8 @@ func Registration(c *gin.Context)  {
 
 	user.Save()
 
-	access_jwt, a_err := pkg.GenerateJWT(user, pkg.ACCESS)
-	refresh_jwt, r_err := pkg.GenerateJWT(user, pkg.REFRESH)
+	access_jwt, a_err := pkg.GenerateJWT(user, config.ACCESS)
+	refresh_jwt, r_err := pkg.GenerateJWT(user, config.REFRESH)
 
 	if a_err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": a_err.Error()})
@@ -94,23 +95,23 @@ func Registration(c *gin.Context)  {
 }
 
 func Refresh(c *gin.Context)  {
-	user, err := pkg.CurrentUser(c, pkg.REFRESH)
+	user, err := pkg.CurrentUser(c, config.REFRESH)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 	}
 
 
-	access_jwt, a_err := pkg.GenerateJWT(user, pkg.ACCESS)
-	refresh_jwt, r_err := pkg.GenerateJWT(user, pkg.REFRESH)
+	access_jwt, a_err := pkg.GenerateJWT(user, config.ACCESS)
+	refresh_jwt, r_err := pkg.GenerateJWT(user, config.REFRESH)
 
 	if a_err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": a_err.Error()})
+        c.JSON(http.StatusInternalServerError, gin.H{"error": a_err.Error()})
         return
     }
 
 	if r_err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": r_err.Error()})
+        c.JSON(http.StatusInternalServerError, gin.H{"error": r_err.Error()})
         return
     }
 
