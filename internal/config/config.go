@@ -1,10 +1,10 @@
 package config
 
-type TokenType uint
+type TokenType string
 
 const (
-	ACCESS  TokenType = 0
-	REFRESH TokenType = 1
+	ACCESS  TokenType = "ACCESS_TOKEN_TTL"
+	REFRESH TokenType = "REFRESH_TOKEN_TTL"
 )
 
 type Status uint
