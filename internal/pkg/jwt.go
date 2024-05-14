@@ -8,21 +8,16 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Bonk123123/notes_server/internal/config"
 	"github.com/Bonk123123/notes_server/internal/models"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type token_type string
-
-const (
-	ACCESS  token_type = "ACCESS_TOKEN_TTL"
-	REFRESH token_type = "REFRESH_TOKEN_TTL"
-)
 
 var privateKey = []byte(os.Getenv("JWT_PRIVATE_KEY"))
 
-func GenerateJWT(user models.User, tt token_type) (string, error) {
+func GenerateJWT(user models.User, tt config.TokenType) (string, error) {
     tokenTTL, _ := strconv.Atoi(os.Getenv(string(tt)))
     token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
         "id":  user.ID,
@@ -32,7 +27,7 @@ func GenerateJWT(user models.User, tt token_type) (string, error) {
     return token.SignedString(privateKey)
 }
 
-func ValidateJWT(c *gin.Context, tt token_type) error {
+func ValidateJWT(c *gin.Context, tt config.TokenType) error {
     token, err := getToken(c, tt)
     if err != nil {
         return err
@@ -44,7 +39,7 @@ func ValidateJWT(c *gin.Context, tt token_type) error {
     return errors.New("invalid token provided")
 }
 
-func CurrentUser(c *gin.Context, tt token_type) (models.User, error) {
+func CurrentUser(c *gin.Context, tt config.TokenType) (models.User, error) {
     err := ValidateJWT(c, tt)
     if err != nil {
         return models.User{}, err
@@ -60,9 +55,9 @@ func CurrentUser(c *gin.Context, tt token_type) (models.User, error) {
     return user, nil
 }
 
-func getToken(c *gin.Context, tt token_type) (*jwt.Token, error) {
+func getToken(c *gin.Context, tt config.TokenType) (*jwt.Token, error) {
     var tokenString string
-	if (tt == ACCESS) {
+	if (tt == config.ACCESS) {
 		tokenString = getTokenFromRequest(c)
 	} else {
 		tokenString = getTokenFromCookie(c)

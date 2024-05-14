@@ -22,6 +22,14 @@ func (note *Note) Save() (*Note, error) {
     return note, nil
 }
 
+func Delete(note_id uint) error {
+    err := database.Db.Delete(note_id).Error
+    if err != nil {
+        return err
+    }
+    return nil
+}
+
 func FindAllNotes() ([]Note, error) {
     var notes []Note
     err := database.Db.Find(&notes).Error
